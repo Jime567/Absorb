@@ -1,0 +1,76 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-size: 16px;
+  font-family: sans-serif;
+  background-color: #22252B;
+  color: white;
+  width: 100%;
+  min-height: 100%;
+}
+@media only screen and (min-width: 768px) {
+  html, body {
+    font-size: 22px;
+  }
+}
+
+body {
+  padding: 20px;
+  background-color: #22252B;
+}
+
+section {
+  background-color: #223D60;
+  width: 90%;
+  max-width: 700px;
+  margin: auto;
+  border: 1px solid #223D60;
+  border-radius: 10px;
+}
+
+button {
+  background-color: #1A970A;
+  border: 0px;
+  border-radius: 10px;
+  color: white;
+}
+
+.CreateAccountContainer {
+  padding: 0.75rem;
+}
+.CreateAccountContainer h1 {
+  font-size: xx-large;
+}
+.CreateAccountContainer form {
+  padding: 0.5rem;
+  width: 100%;
+}
+.CreateAccountContainer form label {
+  margin-bottom: 0.5rem;
+}
+.CreateAccountContainer form input {
+  width: 100%;
+  min-height: 48px;
+  background-color: #1A970A;
+  border: 0px;
+  color: white;
+  border-radius: 10px;
+  padding: 0.5rem;
+  margin-top: 0.3rem;
+  margin-bottom: 0.3rem;
+}
+.CreateAccountContainer form .LogInButtonDiv {
+  text-align: center;
+}
+.CreateAccountContainer form .LogInButtonDiv button {
+  text-align: center;
+  background-color: #FF27A9;
+  padding: 0.5rem;
+  min-height: 48px;
+  margin-top: 1rem;
+  width: 50%;
+}/*# sourceMappingURL=style.css.map */

@@ -1,0 +1,54 @@
+$default-font-color: white;
+$background-color: #22252B;
+$container-bgcolor: #223D60;
+$container-bordercolor: #FF27A9;
+$textbox-bordercolor: #FF27A9;
+$button-textcolor: #fff;
+$button-hovercolor: #000;
+$add-button-color: #1A970A;
+$clear-button-color: #d70b0b;
+
+@mixin mp($size) {
+    @media only screen and (min-width: $size) {
+        @content
+    }
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    font-size: 16px;
+    font-family: sans-serif;
+    background-color: $background-color;
+    color: $default-font-color;
+    width: 100%;
+    min-height: 100%;
+    @include mp(768px) {
+        font-size: 22px;
+    }
+}
+
+body {
+    padding: 20px;
+    background-color: $background-color;
+}
+
+
+section {
+    background-color: $container-bgcolor;
+    width: 90%;
+    max-width: 700px;
+    margin: auto;
+    border: 1px solid $container-bgcolor;
+    border-radius: 10px;
+}
+
+button {
+    background-color: #1A970A;
+    border: 0px;
+    border-radius: 10px;
+    color: white;
+}

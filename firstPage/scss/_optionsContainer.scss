@@ -1,0 +1,24 @@
+.LogOrCreateContainer {
+    padding:.75rem;
+    h1 {
+        margin-bottom: .75rem;
+        font-size: xx-large;
+    }
+    
+    .twoButtons {
+        text-align: center; 
+        
+        button {
+            width: 100%;
+            align-self: center;
+            padding: .5rem;
+            background-color: #1A970A;
+            border-radius: 10px;
+            border: 0px;
+            margin-top: .5rem;
+            font-size: 1.25rem;
+        }
+    }
+        
+       
+}
