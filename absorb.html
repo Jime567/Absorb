@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/scss/style.css"/>
+    <script src="/mainMain.js" type="module"></script>
+
+    <title>Absorb</title>
+</head>
+<body>
+ <div id="viewScreen">
+    <!-- First Page Screen -->
+    <div class="view" id="firstPagescreen">
+    <section class="LogOrCreateContainer">
+        <h1 id="title">Absorb</h1> 
+        <div class="twoButtons";> 
+            <button id="CreateAccountButton">Create Account</button>
+            <button  id="LogInButton">Log In</button>
+        </div>
+        </section>
+    </section>
+    </div>
+
+    <!--Create Account Screen-->
+    <div class="view" id="createaccountscreen">
+        <section class="CreateAccountContainer">
+            <h1 id="title">Create Account</h1>
+            <form id = "createAccountForm">
+                <label for="newEmail">Email Address</label>
+                <input id="newEmail" type="text"
+                size ="40" autocomplete="on" placeholder="Email Address"/>
+    
+                <label for="newPassword">Password</label>
+                <input id="newPassword" type="password"
+                size ="40" autocomplete="on" placeholder="Create Password"/>
+                <div class="CreateButtonDiv">
+                <button id="CreationSubmitButton" >Create</button>
+                </div>    
+            </form>
+        </section>
+
+    </div>
+
+    <!--Log-in Screen-->
+    <div class="view" id="loginscreen">
+        <section class="CreateAccountContainer">
+            <h1 id="title">Log In</h1>
+            <form id = "LogInForm">
+                <label for="inputEmail">Email Address</label>
+                <input id="inputEmail" type="text"
+                size ="40" autocomplete="on" placeholder="Email Address"/>
+    
+                <label for="inputPassword">Password</label>
+                <input id="inputPassword" type="password"
+                size ="40" autocomplete="on" placeholder="Create Password"/>
+                <div class="LogInButtonDiv">
+                <button id="LogInSubmitButton" >Submit</button>
+                </div>    
+            </form>
+        </section>
+
+    </div>
+
+    <!--Landing Screen-->
+    <div class="view" id="landingscreen">
+        <section class="LandingScreenContainer">
+            <h1 class="pagetitle" id='landingHeader'>You should not be on this page.</h1>
+            <button id="signOutButton">sign out</button>
+        </section>
+    </div>
+    
+</div> 
+</body>
+</html>

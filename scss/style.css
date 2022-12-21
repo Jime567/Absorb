@@ -39,6 +39,28 @@ button {
   color: white;
 }
 
+/* First Page---------------------------------------------------------------------*/
+.LogOrCreateContainer {
+  padding: 0.75rem;
+}
+.LogOrCreateContainer h1 {
+  margin-bottom: 0.75rem;
+  font-size: xx-large;
+}
+.LogOrCreateContainer .twoButtons {
+  text-align: center;
+}
+.LogOrCreateContainer .twoButtons button {
+  width: 100%;
+  align-self: center;
+  padding: 0.5rem;
+  background-color: #1A970A;
+  border-radius: 10px;
+  border: 0px;
+  margin-top: 0.5rem;
+  font-size: 1.25rem;
+}
+
 .CreateAccountContainer {
   padding: 0.75rem;
 }
@@ -62,11 +84,50 @@ button {
   padding: 0.5rem;
   margin-top: 0.3rem;
   margin-bottom: 0.3rem;
+  font-size: 20px;
 }
 .CreateAccountContainer form .CreateButtonDiv {
   text-align: center;
 }
 .CreateAccountContainer form .CreateButtonDiv button {
+  text-align: center;
+  background-color: #FF27A9;
+  padding: 0.5rem;
+  min-height: 48px;
+  margin-top: 1rem;
+  width: 50%;
+  font-size: 20px;
+}
+
+.CreateAccountContainer {
+  padding: 0.75rem;
+}
+.CreateAccountContainer h1 {
+  font-size: xx-large;
+}
+.CreateAccountContainer form {
+  padding: 0.5rem;
+  width: 100%;
+}
+.CreateAccountContainer form label {
+  margin-bottom: 0.5rem;
+}
+.CreateAccountContainer form input {
+  width: 100%;
+  min-height: 48px;
+  background-color: #1A970A;
+  border: 0px;
+  color: white;
+  border-radius: 10px;
+  padding: 0.5rem;
+  margin-top: 0.3rem;
+  margin-bottom: 0.3rem;
+  font-size: 20px;
+}
+.CreateAccountContainer form .LogInButtonDiv {
+  text-align: center;
+}
+.CreateAccountContainer form .LogInButtonDiv button {
   text-align: center;
   background-color: #FF27A9;
   padding: 0.5rem;
