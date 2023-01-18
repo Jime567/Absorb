@@ -11,6 +11,10 @@
 </head>
 <body>
  <div id="viewScreen">
+    <!-- Blank Page Screen-->
+    <div class="view" id="blankPage">
+        
+    </div>
     <!-- First Page Screen -->
     <div class="view" id="firstPagescreen">
     <section class="LogOrCreateContainer">
@@ -26,7 +30,10 @@
     <!--Create Account Screen-->
     <div class="view" id="createaccountscreen">
         <section class="CreateAccountContainer">
+                <div class="createHeader">
             <h1 id="title">Create Account</h1>
+            <button id="backButtonCreate">Back</button>
+                </div>
             <form id = "createAccountForm">
                 <label for="newEmail">Email Address</label>
                 <input id="newEmail" type="text"
@@ -46,7 +53,10 @@
     <!--Log-in Screen-->
     <div class="view" id="loginscreen">
         <section class="CreateAccountContainer">
-            <h1 id="title">Log In</h1>
+            <div class="LogInHeader">
+                <h1 id="title">Log In</h1>
+                <button id="backButtonLogIn">Back</button>
+            </div>
             <form id = "LogInForm">
                 <label for="inputEmail">Email Address</label>
                 <input id="inputEmail" type="text"
@@ -66,11 +76,32 @@
     <!--Landing Screen-->
     <div class="view" id="landingscreen">
         <section class="LandingScreenContainer">
+            <div class="LandingHeader">
             <h1 class="pagetitle" id='landingHeader'>You should not be on this page.</h1>
             <button id="signOutButton">sign out</button>
+            </div>
+            <button class="createDeckButton" id="createDeckButton" type="text"
+            size ="40" autocomplete="off" >Create Deck</button>
         </section>
+
+                   
+            <!-- Create Deck Screens -->   
+            <section  class="createdeckscreen" id="createdeckscreen">
+                 <input id="newDeckNameInput" type="text" placeholder="New Deck Name">
+                 <button class="newDeckNameInputButton" id="newDeckNameInputButton" type="text" size="40">Create</button>
+             </section>
+
+                    
+
+                
+     <!--existing flashcards section-->     
+     <div class="listFlashcards" id="listFlashcards" >
+
+
+     </div>   
     </div>
-    
-</div> 
+</div>
+
+   
 </body>
 </html>

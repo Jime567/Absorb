@@ -32,6 +32,15 @@
     h1 {
         font-size: xx-large;
     }
+    .createHeader {
+        display: flex;
+        justify-content: space-between;
+
+        button {
+            min-width: 48px;
+            min-height: 48px;
+        }
+    }
     form {
         padding: .5rem;
         width: 100%;  
@@ -70,6 +79,18 @@
 //Log In Screen -----------------------------------------------------------------------------
 .CreateAccountContainer {
     padding:.75rem;
+
+    .LogInHeader {
+        display: flex;
+        justify-content: space-between;
+
+        button {
+            min-width: 48px;
+            min-height: 48px;  
+            }
+        }
+    }
+
     h1 {
         font-size: xx-large;
     }
@@ -106,4 +127,108 @@
         }    
     }
 
+
+
+//landing page --------------------------------------------------------------------------
+.LandingScreenContainer {
+    width: 90%;
+    max-width: 1200px;
+    padding: .75rem;
+    
+    .LandingHeader {
+        position: sticky;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 1rem;;
+
+        button {
+            padding: .5rem;
+            font-size: .75rem;
+        }
+    } 
+
+    .createDeckButton {
+        min-width: 15%;
+        background-color: #1A970A;
+        border: 0px;
+        min-height: 48px;
+        font-size: 1rem;
+        border-radius: 10px;
+        color: white;
+    }
+
 }
+
+.createdeckscreen {
+    border: 0px;
+    width: 90%;
+    max-width: 1200px;
+    padding: .75rem;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+
+    input[type="text"] {
+        
+        width: 75%;
+        border: 0px;
+        font-size: 1.25rem;
+        color: white;
+        border-radius: 10px;
+        padding: 0.75rem;
+        outline: none;
+        background-color: #1A970A;
+
+    }
+    button {
+        width: 24%;
+        background-color: #FF27A9;
+        border: 0px;
+        min-height: 48px;
+        font-size: 1.25rem;
+        border-radius: 10px;
+        color: white;
+        }
+    
+   
+    
+    }
+
+    .deckListDiv {
+        border: 0px;
+        background-color: #1a8eee;
+        width: 90%;
+        border-radius: 10px;        
+        max-width: 1200px;
+        padding: .75rem;
+        margin: auto;
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+
+        p {
+            padding: 20px;
+            font-weight: bold;
+        }
+    }
+    
+    .doButton {
+        min-height: 48px;
+        min-width: 48px;
+        background-color: rgb(6, 119, 2);
+        border: 0px;
+   }
+
+
+    .deleteButton {
+        min-height: 48px;
+        min-width: 48px;
+        background-color: rgb(243, 70, 70);
+        border: 0px;
+        margin: 10px;
+   }
+
+        
