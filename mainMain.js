@@ -43,7 +43,6 @@ auth.onAuthStateChanged(function (user) {
      if(snapshot.exists()) {
        data = snapshot.val();
        deckList = data;
-       console.log(deckList);
        populateLists();
        }
      else {
@@ -70,6 +69,8 @@ const navigator = (shown, hidden) => {
 //global variables
 var deckList = ["Empty"];
 var cardList = ["Empty"];
+var definitionList = ["Empty"];
+var currDeck = null;
 
 //start blankPage
 const blankPage = document.getElementById("blankPage");
@@ -225,24 +226,28 @@ createDeckButton.addEventListener("click", function () {
   createdeckscreen.style.display = 'block';
   createDeckButton.style.display = 'none';
 });
-
+const deckNameEntryForm = document.getElementById("newDeckNameInput");
 const createDeckNameButton = document.getElementById("newDeckNameInputButton");
+
+deckNameEntryForm.addEventListener("keypress", function(event) {
+  if (event.key === "Enter") {
+    createDeckNameButton.click();
+  }
+});
 createDeckNameButton.addEventListener("click", function () {
-  const deckNameEntryForm = document.getElementById("newDeckNameInput");
   //Collect user-inputted data
   var newDeckName = deckNameEntryForm.value;
   //clear the input
   deckNameEntryForm.value='';
-  //console.log(newDeckName);
   //add deck to database
   deckToDatabase(auth.currentUser.uid, newDeckName);
-  location.reload(); 
+  deleteContents();
+  populateLists();
 });
 
 //populate list of decks
 function populateLists() {
-  console.log(deckList);
-
+  
   if (deckList[0] == "Empty") {
     console.log("This user has no decks")
   }
@@ -252,6 +257,166 @@ function populateLists() {
     }
   }
 }
+
+//populate list of decks in GUI
+const buildListItem = (deckName) => {
+  const div = document.createElement("div");
+  div.className = "deckListDiv";
+  const options = document.createElement("div");
+  options.className = "options";
+
+  //make a paragraph 
+  const para = document.createElement("p");
+  const node = document.createTextNode(deckName);
+  para.appendChild(node);
+  const doer = document.createElement("button");
+  doer.className = "doButton";
+  doer.innerHTML = "Study";
+
+  //make the delete button
+  const deleter = document.createElement("button");
+  deleter.className="deleteButton";
+  deleter.innerHTML = "Delete";
+
+  //make the edit button
+  const editor = document.createElement("button");
+  editor.className = "editButton";
+  editor.innerHTML = "Edit";
+
+  //edit button functionality
+  editor.onclick = function () {
+    
+    navigator('editorscreen', 'landingscreen');
+    const editHeader = document.getElementById('editScreenTitle')
+    console.log(deckName);
+    editHeader.innerHTML = deckName;
+    currDeck = deckName;
+
+    //get cardList from database and update it locally
+    const dbref = ref(db);
+    get(child(dbref,  "users/" + user.uid + '/' + deckName + '/cardList')).then((snapshot)=> {
+    if(snapshot.exists()) {
+      data = snapshot.val();
+      cardList = data;
+      }
+    else {
+      console.log("There be no cards here")
+    }
+  });
+
+  //get definitionList from database and update it locally
+  get(child(dbref,  "users/" + user.uid + '/' + deckName + '/definitionList')).then((snapshot)=> {
+  if(snapshot.exists()) {
+    data = snapshot.val();
+    console.log(data);
+    definitionList = data;
+    //TODO: Populate the lists of cards
+    populateCardLists();
+    }
+  else {
+    console.log("There are no definitions for some reason")
+  }
+});
+    
+  };
+  
+  //delete button functionality
+  deleter.onclick = function () {
+    deleteDeck(user.uid, deckName);
+  };
+  
+  //add individual section to parent div
+  div.appendChild(para);
+
+  options.appendChild(editor);
+  options.appendChild(doer);
+  options.appendChild(deleter);
+  div.appendChild(options);
+  const container = document.getElementById("listFlashcards");
+  container.appendChild(div);
+};
+
+
+
+//Clear list in GUI
+const deleteContents = () => {
+  const parentElement = document.getElementById("listFlashcards");
+  let child = parentElement.lastElementChild;
+  while (child) {
+      parentElement.removeChild(child);
+      child = parentElement.lastElementChild;
+  };
+};
+
+//Start Edit Screen -------------------------------------------------------------------------------->
+const editdeckscreen = document.getElementById("editorscreen");
+//initially set not to be displayed
+editdeckscreen.style.display = "none";
+
+//create card screen controls
+const cardNameEntry = document.getElementById("newCardNameInput");
+const cardTermEntry = document.getElementById("newCardTermInput");
+const createCardButton = document.getElementById("newCardButton");
+
+//back button controls
+const backEditButton = document.getElementById("backButtonEdit");
+backEditButton.addEventListener("click", function () {
+  navigator("landingscreen", "editorscreen");
+});
+//create card button
+createCardButton.addEventListener("click", function () {
+  //Collect user-inputted data
+  var newCardName = cardNameEntry.value;
+  var newCardTerm = cardTermEntry.value;
+  //clear the input
+  cardNameEntry.value='';
+  cardTermEntry.value='';
+  //add card to database
+  console.log(newCardName + ' : ' + newCardTerm);
+  cardToDeck(user.uid, currDeck, newCardName, newCardTerm);  
+  //TODO: Re populate the lists of cards
+});
+
+//populate list of cards in GUI
+const buildCardListItem = (cardTerm, cardDefinition) => {
+  const div = document.createElement("div");
+  div.className = "cardListDiv";
+
+  //make the term  
+  const para = document.createElement("p");
+  const nodeTerm = document.createTextNode(cardTerm);
+  const nodeDefinition = document.createTextNode(cardDefinition);
+  para.appendChild(nodeTerm);
+  para.appendChild(nodeDefinition);
+  const deleter = document.createElement("button");
+  deleter.className = "deleteCardButton";
+  deleter.innerHTML = "Delete";
+  
+  //delete button functionality
+  deleter.onclick = function () {
+    deleteCard(user.uid, cardTerm);
+  };
+  
+  //add individual section to parent div
+  div.appendChild(para);
+  div.appendChild(deleter);
+  const container = document.getElementById("listEditFlashcards");
+  container.appendChild(div);
+};
+
+//populate list of cards
+function populateCardLists() {
+  
+  if (cardList[0] == "Empty") {
+    console.log("This user has no cards")
+  }
+  else {
+    for (let i = 0; i < cardList.length; i++) {
+      buildCardListItem(cardList[i], definitionList[i]);
+    }
+  }
+}
+
 
 //Database Manipulation Functions------------------------------------------------------------------->
 //get the value at a certain path
@@ -275,7 +440,8 @@ function deckToDatabase(userUid, deckName) {
   });
 
   update(ref(db, 'users/' + userUid +'/' + deckName), {
-    cardList: cardList
+    cardList: cardList,
+    definitionList: definitionList
   });
 
   //is this the first deck?
@@ -300,6 +466,23 @@ function cardToDeck(userUid, deckName, cardName, cardDefinition) {
     mc: 0,
     typed: 0
   });
+
+
+  //is this the first card?
+  if (cardList[0] == "Empty") {
+    cardList[0] = cardName;
+    definitionList[0] = cardDefinition;
+  }
+  else {
+    //update the lists of deck for the user locally and on server
+    cardList.push(cardName);
+    definitionList.push(cardDefinition);
+    
+  }
+  update(ref(db, 'users/' + userUid + '/' + deckName), {
+    cardList: cardList,
+    definitionList: definitionList
+  });
   
 }
 
@@ -315,12 +498,20 @@ function deleteDeck(userUid, deckName) {
   update(ref(db, 'users/' + userUid), {
     deckList: deckList
   });
-  location.reload();
+  deleteContents();
+  populateLists();
 }
 
 //delete card from deck in database
 function deleteCard(userUid, deckName, cardName) {
   remove(ref(db, 'users/' + userUid + '/' + deckName + '/' + cardName))
+  var index = cardList.indexOf(cardName);
+  if (index > -1) {
+    cardList.splice(index, 1);
+    definitionList.splice(index, 1);
+    console.log("Deck Deleted From Array");
+  }
+  //TODO: Delete card list in gui and re populate it
 
 }
 
@@ -346,42 +537,3 @@ function setCardDefinition(userUid, deckName, cardName, cardDefinition) {
 }
 // --------------------------------------------------------------------------------------
 
-//populate list of decks in GUI
-const buildListItem = (deckName) => {
-  const div = document.createElement("div");
-  div.className = "deckListDiv";
-  const options = document.createElement("div");
-  options.className = "options";
-
-  const para = document.createElement("p");
-  const node = document.createTextNode(deckName);
-  para.appendChild(node);
-  const doer = document.createElement("button");
-  doer.className = "doButton";
-  doer.innerHTML = "Study";
-
-  const deleter = document.createElement("button");
-  deleter.className="deleteButton";
-  deleter.innerHTML = "Delete";
-  
-  deleter.onclick = function () {
-    deleteDeck(user.uid, deckName);
-  };
-  
-  div.appendChild(para);
-  options.appendChild(doer);
-  options.appendChild(deleter);
-  div.appendChild(options);
-  const container = document.getElementById("listFlashcards");
-  container.appendChild(div);
-};
-
-//Clear list in GUI
-const deleteContents = () => {
-  const parentElement = document.getElementById("listFlashcards");
-  let child = parentElement.lastElementChild;
-  while (child) {
-      parentElement.removeChild(child);
-      child = parentElement.lastElementChild;
-  };
-};
