@@ -59,8 +59,8 @@ auth.onAuthStateChanged(function (user) {
 //start navigation
 var currentView = 'firstPagescreen'
 const navigator = (shown, hidden) => {
-  document.getElementById(shown).style.display = 'block';
   document.getElementById(hidden).style.display = 'none';
+  document.getElementById(shown).style.display = 'block';
   currentView = shown;
 
 
@@ -116,6 +116,9 @@ const initCreateAccountPage = () => {
         const user = userCredential.user;
         const userId = user.uid;
         alert("Registration Successful!");
+        //clear text entry fields
+        document.getElementById('newEmail').value='';
+        document.getElementById('newPassword').value='';
         //setup database
         set(ref(db, 'users/' + userId), {
           email: user.email,
@@ -167,6 +170,9 @@ entryForm.addEventListener("submit", (event) => {
   //Collect user-inputted data
   var email = document.getElementById('inputEmail').value;
   var password = document.getElementById("inputPassword").value;
+  //clear data from entry fields
+  document.getElementById('inputEmail').value ='';
+  document.getElementById('inputPassword').value='';
 
   //send data to firebase auth
   signInWithEmailAndPassword(auth, email, password)
@@ -215,6 +221,7 @@ signOutButton.addEventListener("click", function () {
   signOut(auth);
   deleteContents();
   console.log(data);
+  deleteGlobalVariables();
 });
 //Create Deck Screen
 const createdeckscreen = document.getElementById("createdeckscreen");
@@ -288,7 +295,6 @@ const buildListItem = (deckName) => {
     
     navigator('editorscreen', 'landingscreen');
     const editHeader = document.getElementById('editScreenTitle')
-    console.log(deckName);
     editHeader.innerHTML = deckName;
     currDeck = deckName;
 
@@ -308,9 +314,7 @@ const buildListItem = (deckName) => {
   get(child(dbref,  "users/" + user.uid + '/' + deckName + '/definitionList')).then((snapshot)=> {
   if(snapshot.exists()) {
     data = snapshot.val();
-    console.log(data);
     definitionList = data;
-    //TODO: Populate the lists of cards
     populateCardLists();
     }
   else {
@@ -322,6 +326,7 @@ const buildListItem = (deckName) => {
   
   //delete button functionality
   deleter.onclick = function () {
+
     deleteDeck(user.uid, deckName);
   };
   
@@ -352,16 +357,23 @@ const deleteContents = () => {
 const editdeckscreen = document.getElementById("editorscreen");
 //initially set not to be displayed
 editdeckscreen.style.display = "none";
-
 //create card screen controls
 const cardNameEntry = document.getElementById("newCardNameInput");
 const cardTermEntry = document.getElementById("newCardTermInput");
+cardTermEntry.addEventListener("keydown", function(event) {
+    if (event.code === "Tab") {
+    event.preventDefault();
+    createCardButton.click();
+    cardNameEntry.focus();
+  }
+});
 const createCardButton = document.getElementById("newCardButton");
 
 //back button controls
 const backEditButton = document.getElementById("backButtonEdit");
 backEditButton.addEventListener("click", function () {
   navigator("landingscreen", "editorscreen");
+  deleteEditorContents("listEditFlashcards");
 });
 //create card button
 createCardButton.addEventListener("click", function () {
@@ -371,34 +383,46 @@ createCardButton.addEventListener("click", function () {
   //clear the input
   cardNameEntry.value='';
   cardTermEntry.value='';
+
   //add card to database
   console.log(newCardName + ' : ' + newCardTerm);
   cardToDeck(user.uid, currDeck, newCardName, newCardTerm);  
-  //TODO: Re populate the lists of cards
+  //update GUI
+  deleteEditorContents();
+  populateCardLists();
+  cardNameEntry.focus();
+
 });
 
 //populate list of cards in GUI
 const buildCardListItem = (cardTerm, cardDefinition) => {
+  
   const div = document.createElement("div");
+  const termDiv = document.createElement("div");
+  termDiv.className = "termDiv";
+  const defDiv = document.createElement("div");
+  defDiv.className = "defDiv";
   div.className = "cardListDiv";
 
   //make the term  
-  const para = document.createElement("p");
-  const nodeTerm = document.createTextNode(cardTerm);
-  const nodeDefinition = document.createTextNode(cardDefinition);
-  para.appendChild(nodeTerm);
-  para.appendChild(nodeDefinition);
+  const termPara = document.createElement("p");
+  termPara.innerHTML = convertToText(cardTerm); //converts text to HTML
+  const defPara = document.createElement("p");
+  defPara.innerHTML = convertToText(cardDefinition);
   const deleter = document.createElement("button");
   deleter.className = "deleteCardButton";
   deleter.innerHTML = "Delete";
   
   //delete button functionality
   deleter.onclick = function () {
-    deleteCard(user.uid, cardTerm);
+    deleteCard(user.uid, currDeck, cardTerm);
   };
   
   //add individual section to parent div
-  div.appendChild(para);
+  termDiv.append(termPara);
+  defDiv.append(defPara);
+  div.appendChild(termDiv);
+  div.appendChild(defDiv);
   div.appendChild(deleter);
   const container = document.getElementById("listEditFlashcards");
   container.appendChild(div);
@@ -406,7 +430,6 @@ const buildCardListItem = (cardTerm, cardDefinition) => {
 
 //populate list of cards
 function populateCardLists() {
-  
   if (cardList[0] == "Empty") {
     console.log("This user has no cards")
   }
@@ -416,6 +439,16 @@ function populateCardLists() {
     }
   }
 }
+
+//Clear list in GUI
+const deleteEditorContents = () => {
+  const parentElement = document.getElementById("listEditFlashcards");
+  let child = parentElement.lastElementChild;
+  while (child) {
+      parentElement.removeChild(child);
+      child = parentElement.lastElementChild;
+  };
+};
 
 
 //Database Manipulation Functions------------------------------------------------------------------->
@@ -435,11 +468,11 @@ function getData(path){
 //create Deck in Database
 function deckToDatabase(userUid, deckName) {
 
-  update(ref(db, 'users/' + userUid + '/' + deckName), {
+  update(ref(db, 'users/' + userUid + '/' + convertToPath(deckName)), {
     name: deckName
   });
 
-  update(ref(db, 'users/' + userUid +'/' + deckName), {
+  update(ref(db, 'users/' + userUid +'/' + convertToPath(deckName)), {
     cardList: cardList,
     definitionList: definitionList
   });
@@ -460,7 +493,8 @@ function deckToDatabase(userUid, deckName) {
 
 //create card in deck in database
 function cardToDeck(userUid, deckName, cardName, cardDefinition) {
-  update(ref(db, 'users/' + userUid + '/' + deckName + '/' + cardName), {
+  console.log(convertToPath(cardName));
+  update(ref(db, 'users/' + userUid + '/' + convertToPath(deckName) + '/' + convertToPath(cardName)), {
     name: cardName,
     definition: cardDefinition,
     mc: 0,
@@ -479,7 +513,7 @@ function cardToDeck(userUid, deckName, cardName, cardDefinition) {
     definitionList.push(cardDefinition);
     
   }
-  update(ref(db, 'users/' + userUid + '/' + deckName), {
+  update(ref(db, 'users/' + userUid + '/' + convertToPath(deckName)), {
     cardList: cardList,
     definitionList: definitionList
   });
@@ -488,7 +522,7 @@ function cardToDeck(userUid, deckName, cardName, cardDefinition) {
 
 //delete deck from the database
 function deleteDeck(userUid, deckName) {
-  remove(ref(db, 'users/' + userUid + '/' + deckName));
+  remove(ref(db, 'users/' + userUid + '/' + convertToPath(deckName)));
   var index = deckList.indexOf(deckName);
   if (index > -1) {
     deckList.splice(index, 1);
@@ -500,40 +534,87 @@ function deleteDeck(userUid, deckName) {
   });
   deleteContents();
   populateLists();
+  cardList = ["Empty"];
+  definitionList = ["Empty"];
+  currDeck = null;
 }
 
 //delete card from deck in database
 function deleteCard(userUid, deckName, cardName) {
-  remove(ref(db, 'users/' + userUid + '/' + deckName + '/' + cardName))
+  remove(ref(db, 'users/' + userUid + '/' + convertToPath(deckName) + '/' + convertToPath(cardName)))
   var index = cardList.indexOf(cardName);
   if (index > -1) {
     cardList.splice(index, 1);
     definitionList.splice(index, 1);
-    console.log("Deck Deleted From Array");
+    console.log("Card Deleted From Array");
   }
   //TODO: Delete card list in gui and re populate it
-
+  //update on firebase
+  update(ref(db, 'users/' + userUid + '/' + convertToPath(deckName)), {
+    cardList: cardList,
+    definitionList: definitionList
+  });
+  deleteEditorContents();
+  populateCardLists();
 }
 
 //set the card's multiple choice value
 function setCardMC(userUid, deckName, cardName, value) {
-  update(ref(db, 'users/' + userUid + '/' + deckName + '/' + cardName), {
+  update(ref(db, 'users/' + userUid + '/' + convertToPath(deckName) + '/' + convertToPath(cardName)), {
     mc: value
   });
 }
 
 //set the card's typed value
 function setCardTyped(userUid, deckName, cardName, value) {
-  update(ref(db, 'users/' + userUid + '/' + deckName + '/' + cardName), {
+  update(ref(db, 'users/' + userUid + '/' + convertToPath(deckName) + '/' + convertToPath(cardName)), {
     typed: value
   });
 }
 
 //change the definition on a specific card
 function setCardDefinition(userUid, deckName, cardName, cardDefinition) {
-  update(ref(db, 'users/' + userUid + '/' + deckName + '/' + cardName), {
+  update(ref(db, 'users/' + userUid + '/' + convertToPath(deckName) + '/' + convertToPath(cardName)), {
     definition: cardDefinition
   });
 }
 // --------------------------------------------------------------------------------------
+//Paths must be non-empty strings and can't contain ".", "#", "$", "[", or "]"
+//Parser Functions for User Input
+function convertToPath(string) {
+  length = string.length;
+  for (let i = 0; i < length; i++) {
+    string = string.replace('.', '--PERIOD--');
+    string = string.replace('#', '--HASHTAG--');
+    string = string.replace('$', '--DOLLAR--');
+    string = string.replace('[', '--LEFTBRACKET--');
+    string = string.replace(']', '--RIGHTBRACKET--');
+    string = string.replace('\n', '--NEWLINE--')
+  };
+  return(string);
+}
 
+function convertToText(string) {
+  length = string.length;
+  for (let i = 0; i < length; i++) {
+    string = string.replace('--PERIOD--', '.');
+    string = string.replace('--HASHTAG--', '#');
+    string = string.replace('--DOLLAR--', '$');
+    string = string.replace('--LEFTBRACKET--', '[');
+    string = string.replace('--RIGHTBRACKET--', ']');
+    //convert all line breaks to HTML
+    string = string.replace('--NEWLINE--', '<br>')
+    string = string.replace('\n', '<br>');
+
+  };
+  return(string);
+
+}
+
+//Delete local variables
+function deleteGlobalVariables() {
+  deckList = ["Empty"];
+  cardList = ["Empty"];
+  definitionList = ["Empty"];
+  currDeck = null;
+}

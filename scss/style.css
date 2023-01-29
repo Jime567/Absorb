@@ -1,3 +1,18 @@
+::-moz-placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: white;
+  opacity: 0.75; /* Firefox */
+}
+
+:-ms-input-placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: white;
+  opacity: 0.75; /* Firefox */
+}
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: white;
+  opacity: 0.75; /* Firefox */
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -37,6 +52,15 @@ button {
   border: 0px;
   border-radius: 10px;
   color: white;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+button:hover,
+button:focus {
+  filter: brightness(120%); /*makes button lighter on hover*/
 }
 
 /* First Page---------------------------------------------------------------------*/
@@ -307,11 +331,21 @@ form .LogInButtonDiv button {
   align-items: flex-end;
 }
 .cardListDiv p {
-  padding: 20px;
   font-weight: bold;
+  align-self: center;
 }
 .cardListDiv .deleteCardButton {
   min-height: 48px;
   min-width: 48px;
+  padding: 20px;
+  align-self: center;
   background-color: rgb(243, 70, 70);
+}
+.cardListDiv .termDiv {
+  width: 40%;
+  align-self: center;
+}
+.cardListDiv .defDiv {
+  width: 40%;
+  align-self: center;
 }/*# sourceMappingURL=style.css.map */

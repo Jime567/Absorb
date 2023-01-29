@@ -8,6 +8,11 @@ $button-hovercolor: #000;
 $add-button-color: #1A970A;
 $clear-button-color: #d70b0b;
 
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: white;
+    opacity: .75; /* Firefox */
+  }
+
 @mixin mp($size) {
     @media only screen and (min-width: $size) {
         @content
@@ -51,4 +56,16 @@ button {
     border: 0px;
     border-radius: 10px;
     color: white;
+}
+
+button:hover {
+    cursor: pointer;
+
+}
+
+button:hover, 
+button:focus {
+    filter: brightness(120%); /*makes button lighter on hover*/
+   
+
 }
