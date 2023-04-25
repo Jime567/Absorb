@@ -630,10 +630,9 @@ function genMC() {
   }
   //listener for keypresses
   document.addEventListener("keypress", (event) => {
-    console.log(event.key);
-    if (event.key == "1" || event.key == "2" || event.key == "3" || event.key == "4") {
-     revealAnswer();
-    }
+    // if (event.key == "1" || event.key == "2" || event.key == "3" || event.key == "4") {
+    //  revealAnswer();
+    // }
   });
   //listeners for each option
   option1.addEventListener('click', function onClick(event) {
@@ -721,7 +720,7 @@ function genTyped() {
       var guess = termInput.value;
       guess = guess.toLowerCase();
       var answer = cardList[cardNum];
-      answer = answer.toLowerCase();
+      answer = convertToText(answer).toLowerCase();
       console.log(answer);
       if (guess == answer) {
         deleteTyped();
