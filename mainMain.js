@@ -71,6 +71,7 @@ var deckList = ["Empty"];
 var cardList = ["Empty"];
 var definitionList = ["Empty"];
 var currDeck = null;
+var guest = false;
 
 //start blankPage
 const blankPage = document.getElementById("blankPage");
@@ -89,7 +90,30 @@ logInButton.addEventListener("click", function () {
   navigator('loginscreen', 'firstPagescreen');
 });
 
+//Guest Login Info
+const guestButton = document.getElementById("guestButton");
+guestButton.addEventListener("click", function () {
+  signInGuest(); 
+})
 
+function signInGuest() {
+
+  signInWithEmailAndPassword(auth, "guest@guest.guest", "guestguest")
+  .then((userCredential) => {
+    const user = userCredential.user;
+    console.log(user)
+    //navigate to landing page
+    navigator('landingscreen', 'firstPagescreen');
+    guest = true;
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    console.log(errorMessage);
+    alert(errorMessage);
+  });
+
+}
 
 
 //start create account page ----------------------------------------------------------------
@@ -212,6 +236,10 @@ landingpagescreen.style.display = "none";
 auth.onAuthStateChanged(function (user) {
   if (user) {
     document.getElementsByClassName("pagetitle")[0].innerText = "Account: " + user.email;
+    if (user.email == "guest@guest.guest") {
+      document.getElementsByClassName("pagetitle")[0].innerText = "Absorb: Guest Mode";
+      guest = true;
+    }
   }
 });
 //sign out button
@@ -222,6 +250,7 @@ signOutButton.addEventListener("click", function () {
   deleteContents();
   console.log(data);
   deleteGlobalVariables();
+
 });
 //Create Deck Screen
 const createdeckscreen = document.getElementById("createdeckscreen");
@@ -247,9 +276,14 @@ createDeckNameButton.addEventListener("click", function () {
   //clear the input
   deckNameEntryForm.value='';
   //add deck to database
-  deckToDatabase(auth.currentUser.uid, newDeckName);
-  deleteContents();
-  populateLists();
+  if (guest == true) {
+    alert("Guest Editing Prohibited");
+  }
+  else {
+    deckToDatabase(auth.currentUser.uid, newDeckName);
+    deleteContents();
+    populateLists();
+  }
 });
 
 //populate list of decks
@@ -367,8 +401,12 @@ const buildListItem = (deckName) => {
   
   //delete button functionality
   deleter.onclick = function () {
-
-    deleteDeck(user.uid, deckName);
+    if (guest == false) {
+      deleteDeck(user.uid, deckName);
+    }
+    else {
+      alert("Guest Editing Prohibited")
+    }
   };
   
   //add individual section to parent div
@@ -420,20 +458,24 @@ backEditButton.addEventListener("click", function () {
 });
 //create card button
 createCardButton.addEventListener("click", function () {
-  //Collect user-inputted data
-  var newCardName = cardNameEntry.value;
-  var newCardTerm = cardTermEntry.value;
-  //clear the input
-  cardNameEntry.value='';
-  cardTermEntry.value='';
-  //add card to database
-  console.log(newCardName + ' : ' + newCardTerm);
-  cardToDeck(user.uid, currDeck, newCardName, newCardTerm);  
-  //update GUI
-  deleteEditorContents();
-  populateCardLists();
-  cardNameEntry.focus();
-
+  if (guest == true) {
+    alert("Guest Editing Prohibited");
+  }
+  else {
+    //Collect user-inputted data
+    var newCardName = cardNameEntry.value;
+    var newCardTerm = cardTermEntry.value;
+    //clear the input
+    cardNameEntry.value='';
+    cardTermEntry.value='';
+    //add card to database
+    console.log(newCardName + ' : ' + newCardTerm);
+    cardToDeck(user.uid, currDeck, newCardName, newCardTerm);  
+    //update GUI
+    deleteEditorContents();
+    populateCardLists();
+    cardNameEntry.focus();
+  }
 });
 
 
@@ -458,7 +500,13 @@ const buildCardListItem = (cardTerm, cardDefinition) => {
   
   //delete button functionality
   deleter.onclick = function () {
-    deleteCard(user.uid, currDeck, cardTerm);
+    console.log(guest);
+    if (guest == true) {
+      alert("Guest Editing Prohibited");
+    }
+    else {
+      deleteCard(user.uid, currDeck, cardTerm);
+    }
   };
   
   //add individual section to parent div
@@ -501,7 +549,7 @@ const backer = document.getElementById("backButtonStudy");
   backer.addEventListener("click", function () {
     navigator("landingscreen", "studyscreen");
     const mcTerm = document.getElementById("mcTerm");
-    if (mcTerm != undefined) {
+    if (mcTerm != undefined || mcTerm != null) {
       deleteMC();
     }
     else {
@@ -551,17 +599,19 @@ function genMC() {
   var i = 0;
   while (i < 4) {
     const temp = generateRandomIntegerInRange(0, cardList.length - 1);
+    console.log("Num: ", temp);
     if (temp != cardNum && !list.includes(temp)) {
       list.push(temp);
       i++;
     }
   }
+  i = 0;
   
   option1.innerHTML = definitionList[list[0]];
   option2.innerHTML = definitionList[list[1]];
   option3.innerHTML = definitionList[list[2]];
   option4.innerHTML = definitionList[list[3]];
-  
+  list = [];
   //randomly replace one of the options with the correct value
   const correctOption = generateRandomIntegerInRange(0, 3);
   switch (correctOption) {
@@ -580,7 +630,8 @@ function genMC() {
   }
   //listener for keypresses
   document.addEventListener("keypress", (event) => {
-    if (event.key == "1" || event.key == "2" || event.key == "3" || event.key == "4" || event.key == "space" || event.key == "Enter") {
+    console.log(event.key);
+    if (event.key == "1" || event.key == "2" || event.key == "3" || event.key == "4") {
      revealAnswer();
     }
   });
@@ -695,12 +746,16 @@ function deleteMC() {
   const b = document.getElementById('b');
   const c = document.getElementById('c');
   const d = document.getElementById('d');
-  a.remove();
-  b.remove();
-  c.remove();
-  d.remove();
+  if (a != null) {
+    a.remove();
+    b.remove();
+    c.remove();
+    d.remove();
+
   const term = document.getElementById("mcTerm");
   term.remove();
+  }
+ 
 }
 
 function deleteTyped() {
@@ -901,6 +956,8 @@ function deleteGlobalVariables() {
   cardList = ["Empty"];
   definitionList = ["Empty"];
   currDeck = null;
+  guest = false;
+  
 }
 
 function deleteGlobalVariablesExceptDeckList() {

@@ -84,6 +84,20 @@ button:focus {
   margin-top: 0.5rem;
   font-size: 1.25rem;
 }
+.LogOrCreateContainer .guestButtonDiv {
+  width: 102%;
+  padding: 0.5rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  justify-items: right;
+}
+.LogOrCreateContainer .guestButtonDiv button {
+  justify-self: end;
+  border: 0px;
+  padding: 0.8rem;
+  background-color: #FF27A9;
+}
 
 .CreateAccountContainer {
   padding: 0.75rem;

@@ -23,10 +23,24 @@
             }
         }
             
-           
+        .guestButtonDiv {
+            width: 102%;
+            padding: .5rem;
+            display:flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            justify-items: right;
+
+            button {
+                justify-self: end;
+                border: 0px;
+                padding: .8rem;
+                background-color: #FF27A9;
+            }    
+        }  
     }
 
-//create account screen --------------------------------------------------------------------
+    //create account screen --------------------------------------------------------------------
 .CreateAccountContainer {
     padding:.75rem;
     h1 {
