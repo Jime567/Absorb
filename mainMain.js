@@ -267,6 +267,8 @@ function populateLists() {
 
 //populate list of decks in GUI
 const buildListItem = (deckName) => {
+  const isoContainer = document.createElement("div");
+  isoContainer.className = "isoContainer";
   const div = document.createElement("div");
   div.className = "deckListDiv";
   const options = document.createElement("div");
@@ -276,10 +278,49 @@ const buildListItem = (deckName) => {
   const para = document.createElement("p");
   const node = document.createTextNode(deckName);
   para.appendChild(node);
+
+  //make the study button
   const doer = document.createElement("button");
   doer.className = "doButton";
   doer.innerHTML = "Study";
 
+  //study button functionality
+   doer.onclick = function () {
+    const dbref = ref(db);
+    currDeck = deckName;
+    //get the list of cards and check first to see if it is empty
+    get(child(dbref,  "users/" + user.uid + '/' + convertToPath(deckName) + '/definitionList')).then((snapshot)=> {
+      if(snapshot.exists()) {
+        data = snapshot.val();
+        definitionList = data;
+        if (definitionList[0] == "Empty") {
+          alert("No Cards to Study");
+        }
+        //if not empty, navigate on
+        else {
+          const studyHeader = document.getElementById("studyScreenHeader");
+          studyHeader.innerHTML = (deckName);
+          navigator('studyscreen', 'landingscreen');
+          //get the card list
+          get(child(dbref,  "users/" + user.uid + '/' + convertToPath(deckName) + "/cardList")).then((snapshot)=> {
+          if(snapshot.exists()) {
+            data = snapshot.val();
+            cardList = data;
+            startStudy();
+            }
+          else {
+            console.log("There be no cards here")
+            }
+          });
+        }
+        }
+      else {
+        alert("No Cards to Study");
+      }
+    });
+    
+      
+  }
   //make the delete button
   const deleter = document.createElement("button");
   deleter.className="deleteButton";
@@ -338,7 +379,8 @@ const buildListItem = (deckName) => {
   options.appendChild(deleter);
   div.appendChild(options);
   const container = document.getElementById("listFlashcards");
-  container.appendChild(div);
+  isoContainer.appendChild(div);
+  container.appendChild(isoContainer);
 };
 
 
@@ -372,6 +414,7 @@ const createCardButton = document.getElementById("newCardButton");
 //back button controls
 const backEditButton = document.getElementById("backButtonEdit");
 backEditButton.addEventListener("click", function () {
+  deleteGlobalVariablesExceptDeckList();
   navigator("landingscreen", "editorscreen");
   deleteEditorContents("listEditFlashcards");
 });
@@ -383,7 +426,6 @@ createCardButton.addEventListener("click", function () {
   //clear the input
   cardNameEntry.value='';
   cardTermEntry.value='';
-
   //add card to database
   console.log(newCardName + ' : ' + newCardTerm);
   cardToDeck(user.uid, currDeck, newCardName, newCardTerm);  
@@ -393,6 +435,7 @@ createCardButton.addEventListener("click", function () {
   cardNameEntry.focus();
 
 });
+
 
 //populate list of cards in GUI
 const buildCardListItem = (cardTerm, cardDefinition) => {
@@ -449,28 +492,251 @@ const deleteEditorContents = () => {
       child = parentElement.lastElementChild;
   };
 };
+//Start Study Screen ------------------------------------------------------------------------------->
+const studyPage = document.getElementById('studyscreen');
+studyPage.style.display = 'none';
+
+//back button 
+const backer = document.getElementById("backButtonStudy");
+  backer.addEventListener("click", function () {
+    navigator("landingscreen", "studyscreen");
+    const mcTerm = document.getElementById("mcTerm");
+    if (mcTerm != undefined) {
+      deleteMC();
+    }
+    else {
+      deleteTyped();
+    }
+    
+  });
+//start study mode function
+function startStudy() {
+  const genMode = generateRandomIntegerInRange(0,1);
+  if (genMode == 0) {
+    genTyped();
+  }
+  else {
+    if (cardList.length < 5) {
+      genTyped();
+    }
+    else {
+      genMC();
+    }
+  }
+}
+
+function genMC() {
+  //generate visuals
+  const mcDiv = document.createElement("div");
+  mcDiv.className = "mcDiv";
+  const options = document.createElement("div");
+  options.className = "options";
+  const mcTerm = document.createElement('h2');
+  mcTerm.id = "mcTerm";
+  const option1 = document.createElement("button");
+  option1.id = "a";
+  const option2 = document.createElement("button");
+  option2.id = 'b';
+  const option3 = document.createElement("button");
+  option3.id = 'c';
+  const option4 = document.createElement("button");
+  option4.id='d';
+  
+  //get a card from the list
+  const cardNum = generateRandomIntegerInRange(0, cardList.length -1 );
+  mcTerm.innerHTML = cardList[cardNum];
+  
+  //populate the options
+  var list = [];
+  var i = 0;
+  while (i < 4) {
+    const temp = generateRandomIntegerInRange(0, cardList.length - 1);
+    if (temp != cardNum && !list.includes(temp)) {
+      list.push(temp);
+      i++;
+    }
+  }
+  
+  option1.innerHTML = definitionList[list[0]];
+  option2.innerHTML = definitionList[list[1]];
+  option3.innerHTML = definitionList[list[2]];
+  option4.innerHTML = definitionList[list[3]];
+  
+  //randomly replace one of the options with the correct value
+  const correctOption = generateRandomIntegerInRange(0, 3);
+  switch (correctOption) {
+    case 0:
+      option1.innerHTML = definitionList[cardNum];
+      break;
+    case 1:
+      option2.innerHTML = definitionList[cardNum];
+      break;
+    case 2:
+      option3.innerHTML = definitionList[cardNum];
+      break;
+    case 3:
+      option4.innerHTML = definitionList[cardNum];
+      break;
+  }
+  //listener for keypresses
+  document.addEventListener("keypress", (event) => {
+    if (event.key == "1" || event.key == "2" || event.key == "3" || event.key == "4" || event.key == "space" || event.key == "Enter") {
+     revealAnswer();
+    }
+  });
+  //listeners for each option
+  option1.addEventListener('click', function onClick(event) {
+    revealAnswer();     
+  });
+
+  option2.onclick = function () {
+    revealAnswer();
+  }
+    
+  option3.onclick = function () {
+    revealAnswer();
+  }
+
+  option4.onclick = function () {
+    revealAnswer();
+  }
+  //add everything into the HTML
+  const studyScreen = document.getElementById("StudyScreenContainer");
+  options.appendChild(option1);
+  options.appendChild(option2);
+  options.appendChild(option3);
+  options.appendChild(option4);
+  mcDiv.appendChild(mcTerm);
+  mcDiv.appendChild(options); 
+  studyScreen.appendChild(mcDiv);
+
+  function revealAnswer() {
+    option1.style.backgroundColor = "#d90f3b";
+    option2.style.backgroundColor = "#d90f3b";
+    option3.style.backgroundColor = "#d90f3b";
+    option4.style.backgroundColor = "#d90f3b";
+    console.log(correctOption);
+    switch (correctOption) {
+      case 0:
+        option1.style.backgroundColor = "#1A970A";
+        break;
+      case 1:
+        option2.style.backgroundColor = "#1A970A";
+        break;
+      case 2:
+        option3.style.backgroundColor = "#1A970A";    
+        break;
+      case 3:
+        option4.style.backgroundColor = "#1A970A";        
+        break;
+    }
+    setTimeout(function(){
+      deleteMC();
+      startStudy();
+    }, 2000);
+    
+
+  }
+}
+
+function genTyped() {
+  //generate visuals
+  const buttonDiv = document.createElement("div");
+  buttonDiv.className = "buttonDiv";
+  const showAnswer = document.createElement("button");
+  showAnswer.innerHTML = "Show Answer";
+  showAnswer.id = "showAnswer";
+  showAnswer.class = "showAnswer";
+  buttonDiv.appendChild(showAnswer);
+  const defHeader = document.createElement('h2');
+  defHeader.id = "defHeader";
+  const studyContainer = document.getElementById("StudyScreenContainer");
+  studyContainer.appendChild(defHeader);
+  const termInput = document.createElement("input");
+  termInput.id = ("termInput");
+  termInput.style = "resize: none;"
+  termInput.placeholder = "Enter Term";
+  studyContainer.appendChild(termInput);
+
+  //get a card from the list
+  const cardNum = generateRandomIntegerInRange(0, cardList.length - 1);
+  defHeader.innerHTML = definitionList[cardNum];
+  
+  //retrieve and evaluate response
+  termInput.focus();
+  termInput.addEventListener("keypress", (event) => {
+    if (event.key == "Enter") {
+      //Collect user-inputted data
+      var guess = termInput.value;
+      guess = guess.toLowerCase();
+      var answer = cardList[cardNum];
+      answer = answer.toLowerCase();
+      console.log(answer);
+      if (guess == answer) {
+        deleteTyped();
+        startStudy();
+      }
+      else {
+        termInput.value = "";
+        termInput.placeholder ="Try Again"
+        studyContainer.appendChild(buttonDiv);
+      }
+    }
+    showAnswer.addEventListener("click", function () {
+      termInput.placeholder = cardList[cardNum];
+      termInput.focus();
+    });
+
+});
+}
+
+function deleteMC() {
+  const a = document.getElementById('a');
+  const b = document.getElementById('b');
+  const c = document.getElementById('c');
+  const d = document.getElementById('d');
+  a.remove();
+  b.remove();
+  c.remove();
+  d.remove();
+  const term = document.getElementById("mcTerm");
+  term.remove();
+}
+
+function deleteTyped() {
+  const defHeader = document.getElementById("defHeader");
+  const termInput = document.getElementById("termInput");
+  const showAnswer = document.getElementById("showAnswer");
+  defHeader.remove();
+  termInput.remove();
+  if (showAnswer != null) {
+    showAnswer.remove();
+  }
 
 
+}
 //Database Manipulation Functions------------------------------------------------------------------->
 //get the value at a certain path
 function getData(path){
+  //get deckList data from firebase
   const dbref = ref(db);
-  get(child(dbref,  path )).then((snapshot)=> {
+    get(child(dbref,  path)).then((snapshot)=> {
     if(snapshot.exists()) {
       data = snapshot.val();
-    }
+      console.log("Data within get Data "+ data);
+      const temp = document.getElementById("studyScreenHeader");
+      return data;
+      }
     else {
-      console.log("There is no data here")
+      console.log("There be no cards here")
     }
-  }); 
+  });
 }
 
 //create Deck in Database
 function deckToDatabase(userUid, deckName) {
 
-  update(ref(db, 'users/' + userUid + '/' + convertToPath(deckName)), {
-    name: deckName
-  });
+  
 
   update(ref(db, 'users/' + userUid +'/' + convertToPath(deckName)), {
     cardList: cardList,
@@ -565,11 +831,24 @@ function setCardMC(userUid, deckName, cardName, value) {
   });
 }
 
+function getCardMC(userUid, deckName, cardName) {
+  const path = "users/" + userUid + '/' + convertToPath(deckName) + '/' + convertToPath(cardName) + "/mc";
+  data = getData(path);
+  return data;
+}
+
 //set the card's typed value
 function setCardTyped(userUid, deckName, cardName, value) {
-  update(ref(db, 'users/' + userUid + '/' + convertToPath(deckName) + '/' + convertToPath(cardName)), {
+  update(ref(db, 'users/' + userUid + '/' + convertToPath(deckName) + '/' + cardName), {
     typed: value
   });
+  setCardMC(userUid, deckName, cardName, value);
+}
+
+function getCardTyped(userUid, deckName, cardName) {
+  const path = "users/" + userUid + '/' + convertToPath(deckName) + '/' + convertToPath(cardName) + '/typed';
+  data = getData(path);
+  return data;
 }
 
 //change the definition on a specific card
@@ -611,9 +890,20 @@ function convertToText(string) {
 
 }
 
+//random number generator
+function generateRandomIntegerInRange(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 //Delete local variables
 function deleteGlobalVariables() {
   deckList = ["Empty"];
+  cardList = ["Empty"];
+  definitionList = ["Empty"];
+  currDeck = null;
+}
+
+function deleteGlobalVariablesExceptDeckList() {
   cardList = ["Empty"];
   definitionList = ["Empty"];
   currDeck = null;
