@@ -320,6 +320,12 @@ const buildListItem = (deckName) => {
 
   //study button functionality
    doer.onclick = function () {
+    if (document.getElementById("mcTerm" != null)) {
+      deleteMC();
+    }
+    if (document.getElementById("termInput") != null) {
+      deleteTyped();
+    }
     const dbref = ref(db);
     currDeck = deckName;
     //get the list of cards and check first to see if it is empty
@@ -544,22 +550,24 @@ const deleteEditorContents = () => {
 const studyPage = document.getElementById('studyscreen');
 studyPage.style.display = 'none';
 
+
 //back button 
 const backer = document.getElementById("backButtonStudy");
   backer.addEventListener("click", function () {
     navigator("landingscreen", "studyscreen");
     const mcTerm = document.getElementById("mcTerm");
-    if (mcTerm != undefined || mcTerm != null) {
-      deleteMC();
-    }
-    else {
-      deleteTyped();
-    }
-    
+    deleteMC();
+    deleteTyped();  
   });
 //start study mode function
 function startStudy() {
   const genMode = generateRandomIntegerInRange(0,1);
+  if (document.getElementById("mcTerm" != null)) {
+    deleteMC();
+  }
+  if (document.getElementById("termInput") != null) {
+    deleteTyped();
+  }
   if (genMode == 0) {
     genTyped();
   }
@@ -575,6 +583,12 @@ function startStudy() {
 
 function genMC() {
   //generate visuals
+  if (document.getElementById("mcTerm" != null)) {
+    deleteMC();
+  }
+  if (document.getElementById("termInput") != null) {
+    deleteTyped();
+  }
   const mcDiv = document.createElement("div");
   mcDiv.className = "mcDiv";
   const options = document.createElement("div");
@@ -607,10 +621,10 @@ function genMC() {
   }
   i = 0;
   
-  option1.innerHTML = definitionList[list[0]];
-  option2.innerHTML = definitionList[list[1]];
-  option3.innerHTML = definitionList[list[2]];
-  option4.innerHTML = definitionList[list[3]];
+  option1.innerHTML = convertToText(definitionList[list[0]]);
+  option2.innerHTML = convertToText(definitionList[list[1]]);
+  option3.innerHTML = convertToText(definitionList[list[2]]);
+  option4.innerHTML = convertToText(definitionList[list[3]]);
   list = [];
   //randomly replace one of the options with the correct value
   const correctOption = generateRandomIntegerInRange(0, 3);
@@ -628,12 +642,7 @@ function genMC() {
       option4.innerHTML = definitionList[cardNum];
       break;
   }
-  //listener for keypresses
-  document.addEventListener("keypress", (event) => {
-    // if (event.key == "1" || event.key == "2" || event.key == "3" || event.key == "4") {
-    //  revealAnswer();
-    // }
-  });
+  
   //listeners for each option
   option1.addEventListener('click', function onClick(event) {
     revealAnswer();     
@@ -683,7 +692,7 @@ function genMC() {
     setTimeout(function(){
       deleteMC();
       startStudy();
-    }, 2000);
+    }, 1300);
     
 
   }
@@ -691,6 +700,12 @@ function genMC() {
 
 function genTyped() {
   //generate visuals
+  if (document.getElementById("mcTerm" != null)) {
+    deleteMC();
+  }
+  if (document.getElementById("termInput") != null) {
+    deleteTyped();
+  }
   const buttonDiv = document.createElement("div");
   buttonDiv.className = "buttonDiv";
   const showAnswer = document.createElement("button");
@@ -710,7 +725,7 @@ function genTyped() {
 
   //get a card from the list
   const cardNum = generateRandomIntegerInRange(0, cardList.length - 1);
-  defHeader.innerHTML = definitionList[cardNum];
+  defHeader.innerHTML = convertToText(definitionList[cardNum]);
   
   //retrieve and evaluate response
   termInput.focus();
@@ -720,8 +735,9 @@ function genTyped() {
       var guess = termInput.value;
       guess = guess.toLowerCase();
       var answer = cardList[cardNum];
-      answer = convertToText(answer).toLowerCase();
-      console.log(answer);
+      answer = convertToTextCompare(answer).toLowerCase();
+      console.log("ANSWER: ", answer);
+      console.log(cardList)
       if (guess == answer) {
         deleteTyped();
         startStudy();
@@ -938,6 +954,23 @@ function convertToText(string) {
     //convert all line breaks to HTML
     string = string.replace('--NEWLINE--', '<br>')
     string = string.replace('\n', '<br>');
+
+  };
+  return(string);
+
+}
+
+function convertToTextCompare(string) {
+  length = string.length;
+  for (let i = 0; i < length; i++) {
+    string = string.replace('--PERIOD--', '.');
+    string = string.replace('--HASHTAG--', '#');
+    string = string.replace('--DOLLAR--', '$');
+    string = string.replace('--LEFTBRACKET--', '[');
+    string = string.replace('--RIGHTBRACKET--', ']');
+    //convert all line breaks to HTML
+    string = string.replace('--NEWLINE--', '')
+    string = string.replace('\n', '');
 
   };
   return(string);
