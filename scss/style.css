@@ -366,9 +366,13 @@ form .LogInButtonDiv button {
   align-self: center;
 }
 
+.StudyScreenContainer {
+  border-radius: 20px;
+}
 .StudyScreenContainer .mcDiv .options {
   margin-right: 20px;
   margin-left: 20px;
+  margin-bottom: 20px;
   display: flex;
   justify-content: space-between;
 }
@@ -417,7 +421,7 @@ form .LogInButtonDiv button {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   width: 80%;
   border: 0px;
   font-size: 1.25rem;

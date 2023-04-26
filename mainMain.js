@@ -1,4 +1,5 @@
-// Import the functions needed from firebase sdk's
+//V2.0 
+//Import the functions needed from firebase sdk's
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-analytics.js";
 import {
@@ -557,7 +558,8 @@ const backer = document.getElementById("backButtonStudy");
     navigator("landingscreen", "studyscreen");
     const mcTerm = document.getElementById("mcTerm");
     deleteMC();
-    deleteTyped();  
+    deleteTyped(); 
+    deleteGlobalVariablesExceptDeckList(); 
   });
 //start study mode function
 function startStudy() {
@@ -591,6 +593,7 @@ function genMC() {
   }
   const mcDiv = document.createElement("div");
   mcDiv.className = "mcDiv";
+  mcDiv.id="mcDiv";
   const options = document.createElement("div");
   options.className = "options";
   const mcTerm = document.createElement('h2');
@@ -761,15 +764,19 @@ function deleteMC() {
   const b = document.getElementById('b');
   const c = document.getElementById('c');
   const d = document.getElementById('d');
-  if (a != null) {
+  while (document.getElementById('a') != null) {
     a.remove();
     b.remove();
     c.remove();
     d.remove();
-
-  const term = document.getElementById("mcTerm");
-  term.remove();
   }
+  while (document.getElementById("mcTerm") != null) {
+    document.getElementById("mcTerm").remove();
+  }
+  while (document.getElementById("mcDiv") != null) {
+    document.getElementById("mcDiv").remove();
+  }
+  console.log(document.getElementById("mcTerm"));
  
 }
 
@@ -777,9 +784,11 @@ function deleteTyped() {
   const defHeader = document.getElementById("defHeader");
   const termInput = document.getElementById("termInput");
   const showAnswer = document.getElementById("showAnswer");
-  defHeader.remove();
-  termInput.remove();
-  if (showAnswer != null) {
+  while (document.getElementById("defHeader") != null) {
+    defHeader.remove();
+    termInput.remove();
+  }
+  while (document.getElementById("showAnswer") != null) {
     showAnswer.remove();
   }
 
