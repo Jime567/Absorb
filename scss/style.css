@@ -3,11 +3,6 @@
   opacity: 0.75; /* Firefox */
 }
 
-:-ms-input-placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-  color: white;
-  opacity: 0.75; /* Firefox */
-}
-
 ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
   color: white;
   opacity: 0.75; /* Firefox */
@@ -36,6 +31,7 @@ html, body {
 body {
   padding: 20px;
   background-color: #22252B;
+  margin-top: 50px;
 }
 
 section {
